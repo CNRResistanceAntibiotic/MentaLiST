@@ -1,0 +1,14 @@
+julia 1.0
+Distributed
+ArgParse
+BioSequences
+JSON
+DataStructures
+JLD
+GZip
+Blosc
+FileIO
+TextWrap
+LightXML
+JuMP
+Gurobi

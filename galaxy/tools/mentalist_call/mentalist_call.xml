@@ -1,0 +1,65 @@
+<tool id="mentalist_call" name="MentaLiST MLST Analysis" version="0.2.2">
+  <requirements>
+    <requirement type="package" version="0.2.2">mentalist</requirement>
+  </requirements>
+  <edam_operations>
+    <edam_operation>operation_3840</edam_operation>
+  </edam_operations>
+  <command detect_errors="exit_code"><![CDATA[
+    mentalist
+    call
+    -o '$output_file'
+    --db '$kmer_db.fields.path'
+    --mutation_threshold '$mutation_threshold'
+    --kt '$kmer_threshold'
+    $output_votes
+    $output_special
+    #if $input_type.sPaired == "paired":
+      -1 $input_type.pInput1 -2 $input_type.pInput2
+    #elif $input_type.sPaired == "collections":
+      -1 $input_type.fastq_collection.forward -2 $input_type.fastq_collection.reverse
+    #end if
+  ]]></command>
+  <inputs>
+    <conditional name="input_type">
+      <param name="sPaired" type="select" label="Single Pair or Collection">
+        <option value="collections">Paired-end Collections</option>
+        <option value="paired">Paired-end</option>
+      </param>
+      <when value="paired">
+        <param name="pInput1" type="data" format="fastq,fastqsanger,fastqillumina,fastqsolexa" label="Forward FASTQ file" help="Must have ASCII encoded quality scores"/>
+        <param name="pInput2" type="data" format="fastq,fastqsanger,fastqillumina,fastqsolexa" label="Reverse FASTQ file" help="File format must match the Forward FASTQ file"/>
+      </when>
+      <when value="collections">
+        <param name="fastq_collection" type="data_collection" label="Paired-end Fastq collection" help="" optional="false" format="txt" collection_type="paired" />
+      </when>
+    </conditional>
+    <param name="kmer_db" type="select">
+      <options from_data_table="mentalist_databases">
+	<validator type="no_options" message="No MentaLiST databases are available" />
+      </options>
+    </param>
+    <param name="mutation_threshold" type="integer" label="Mutation threshold"
+	   help="Maximum number of mutations when looking for novel alleles."
+	   value="6" min="1" max="25" />
+    <param name="kmer_threshold" type="integer" label="Kmer threshold"
+	   help="Minimum number of times a kmer is seen to be considered present in the sample."
+	   value="10" min="1" max="25" />
+    <param name="output_votes" type="boolean" label="Output votes"
+	   argument="--output_votes" truevalue="--output_votes" falsevalue=""
+	   help="Outputs the results for the original voting algorithm" />
+    <param name="output_special" type="boolean" label="Output special"
+	   argument="--output_special" truevalue="--output_special" falsevalue=""
+	   help="Outputs a fasta file with the alleles from special cases such as incomplete coverage, novel and multiple alleles." />
+  </inputs>
+  <outputs>
+    <data name="output_file" format="tabular" />
+    <data name="coverage_file" format="tabular" />
+  </outputs>
+  <help><![CDATA[
+  ]]></help>
+  <citations>
+    <citation type="doi">10.1101/172858</citation>
+    <citation type="doi">10.1099/mgen.0.000146</citation>
+  </citations>
+</tool>
