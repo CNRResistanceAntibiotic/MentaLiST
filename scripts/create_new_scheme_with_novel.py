@@ -4,7 +4,6 @@ logger = logging.getLogger()
 
 import argparse
 import collections
-import sys
 import os
 from Bio import SeqIO
 
@@ -16,7 +15,7 @@ if __name__ == "__main__":
     parser.add_argument("-o", "--output", type=str, help="Output folder for new scheme.")
     parser.add_argument("-i", "--id", type=int, default=1000, help="Start numbering new alleles on this value, later will implement from last allele id +1.")
     # parser.add_argument("-t", "--threads", type=int, default=4, help="number of threads")
-    parser.add_argument("files", nargs="+", help="MLST Fasta files")
+    parser.add_argument("-db", "--pathDB", type=str, help="MLST Fasta Database Directory")
     parser.add_argument('-ll', '--loglevel', type=str, default="INFO", choices=['DEBUG','INFO','WARNING','ERROR','CRITICAL'], help='Set the logging level')
     param = parser.parse_args()
     logging.basicConfig(level=param.loglevel, format='%(asctime)s (%(relativeCreated)d ms) -> %(levelname)s:%(message)s', datefmt='%I:%M:%S %p')
@@ -33,11 +32,12 @@ if __name__ == "__main__":
     # Open mlst
     mlst = {}
     logger.info("Opening the MLST schema and adding novel alleles ...")
-    for f in param.files:
+    for f in os.listdir(param.pathDB):
+        f_path = os.path.join(param.pathDB, f)
         logger.debug("Opening file %s ..." % f)
-        file_no_ext, ext = os.path.splitext(f)
-        locus = os.path.basename(file_no_ext)
-        record_list = [seq_record for seq_record in SeqIO.parse(f, "fasta")]
+        file_no_ext, ext = os.path.splitext(f_path)
+        locus = os.path.basename(f_path)
+        record_list = [seq_record for seq_record in SeqIO.parse(f_path, "fasta")]
         # if there are novel alleles for this locus, add:
         if len(novel[locus]) > 0:
             # find maximum id present, novel alleles gets next;
@@ -50,5 +50,5 @@ if __name__ == "__main__":
                 next_id += 1
                 record_list.append(record)
         # save:
-        SeqIO.write(record_list, os.path.join(param.output, os.path.basename(f)), "fasta")
+        SeqIO.write(record_list, os.path.join(param.output, os.path.basename(f_path)), "fasta")
     logger.info("Done.")
