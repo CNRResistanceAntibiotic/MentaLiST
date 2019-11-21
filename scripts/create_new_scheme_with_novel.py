@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import logging
-logger = logging.getLogger()
+
 
 import argparse
 import collections
@@ -8,16 +8,9 @@ import os
 from Bio import SeqIO
 
 
-if __name__ == "__main__":
+def main(param):
+    logger = logging.getLogger()
 
-    parser = argparse.ArgumentParser(description="Adds novel alleles to an existing MLST scheme.")
-    parser.add_argument("-n", "--novel", type=str, help="FASTA with novel alleles.")
-    parser.add_argument("-o", "--output", type=str, help="Output folder for new scheme.")
-    parser.add_argument("-i", "--id", type=int, default=1000, help="Start numbering new alleles on this value, later will implement from last allele id +1.")
-    # parser.add_argument("-t", "--threads", type=int, default=4, help="number of threads")
-    parser.add_argument("-db", "--pathDB", type=str, help="MLST Fasta Database Directory")
-    parser.add_argument('-ll', '--loglevel', type=str, default="INFO", choices=['DEBUG','INFO','WARNING','ERROR','CRITICAL'], help='Set the logging level')
-    param = parser.parse_args()
     logging.basicConfig(level=param.loglevel, format='%(asctime)s (%(relativeCreated)d ms) -> %(levelname)s:%(message)s', datefmt='%I:%M:%S %p')
 
     # Opening novel alleles:
@@ -52,3 +45,20 @@ if __name__ == "__main__":
         # save:
         SeqIO.write(record_list, os.path.join(param.output, os.path.basename(f_path)), "fasta")
     logger.info("Done.")
+
+
+def run():
+    parser = argparse.ArgumentParser(description="Adds novel alleles to an existing MLST scheme.")
+    parser.add_argument("-n", "--novel", type=str, help="FASTA with novel alleles.")
+    parser.add_argument("-o", "--output", type=str, help="Output folder for new scheme.")
+    parser.add_argument("-i", "--id", type=int, default=1000, help="Start numbering new alleles on this value, later will implement from last allele id +1.")
+    # parser.add_argument("-t", "--threads", type=int, default=4, help="number of threads")
+    parser.add_argument("-db", "--pathDB", type=str, help="MLST Fasta Database Directory")
+    parser.add_argument('-ll', '--loglevel', type=str, default="INFO", choices=['DEBUG','INFO','WARNING','ERROR','CRITICAL'], help='Set the logging level')
+    param = parser.parse_args()
+
+    main(param)
+
+
+if __name__ == '__main__':
+    run()

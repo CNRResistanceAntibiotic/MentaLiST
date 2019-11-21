@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import logging
-logger = logging.getLogger()
+
 from collections import defaultdict, Counter
 import argparse
 from Bio import SeqIO
@@ -11,16 +11,9 @@ def mut_list_to_str(l, locus):
         return str(list(c)[0])
     return ", ".join(["%dx (%d)" % (times, mut) for (mut, times) in c.items()])
 
-if __name__ == "__main__":
+def main(param):
+    logger = logging.getLogger()
 
-    parser = argparse.ArgumentParser(description="Given a list of FASTA files with novel alleles found with MentaLiST, output a FASTA with a unique list of novel alleles.")
-    # parser.add_argument("-s", nargs="+", help="New scheme fasta files, to compare if the novel allees are present.")
-    parser.add_argument("-f", nargs="+", help="Fasta files with novel alleles.")
-    parser.add_argument("-o", type=str, help="Output Fasta file with alleles above the threshold requirement(s).")
-    parser.add_argument("-t", "--threshold", type=int, default=1, help="Minimum number of different samples to appear, to include a novel allele in the output fasta.")
-    parser.add_argument("-m", "--mutation", type=int, default=0, help="Also include if novel allel has equal or less than this number of mutations, regardless of times seen. Disabled by default.")
-    parser.add_argument('-ll', '--loglevel', type=str, default="INFO", choices=['DEBUG','INFO','WARNING','ERROR','CRITICAL'], help='Set the logging level')
-    param = parser.parse_args()
     logging.basicConfig(level=param.loglevel, format='%(asctime)s (%(relativeCreated)d ms) -> %(levelname)s:%(message)s', datefmt='%I:%M:%S %p')
 
     logger.info("Reading the new alleles  ...")
@@ -69,3 +62,21 @@ if __name__ == "__main__":
             f.write("%s\t%dx\t%s\n" % tuple)
 
     logger.info("Done.")
+
+def run():
+
+    parser = argparse.ArgumentParser(description="Given a list of FASTA files with novel alleles found with MentaLiST, output a FASTA with a unique list of novel alleles.")
+    # parser.add_argument("-s", nargs="+", help="New scheme fasta files, to compare if the novel allees are present.")
+    parser.add_argument("-f", nargs="+", help="Fasta files with novel alleles.")
+    parser.add_argument("-o", type=str, help="Output Fasta file with alleles above the threshold requirement(s).")
+    parser.add_argument("-t", "--threshold", type=int, default=1, help="Minimum number of different samples to appear, to include a novel allele in the output fasta.")
+    parser.add_argument("-m", "--mutation", type=int, default=0, help="Also include if novel allel has equal or less than this number of mutations, regardless of times seen. Disabled by default.")
+    parser.add_argument('-ll', '--loglevel', type=str, default="INFO", choices=['DEBUG','INFO','WARNING','ERROR','CRITICAL'], help='Set the logging level')
+    param = parser.parse_args()
+
+    main(param)
+
+
+
+if __name__ == '__main__':
+    run()
