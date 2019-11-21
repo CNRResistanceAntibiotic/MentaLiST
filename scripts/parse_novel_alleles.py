@@ -1,10 +1,8 @@
-#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 import logging
 logger = logging.getLogger()
 from collections import defaultdict, Counter
 import argparse
-import sys
-import os
 from Bio import SeqIO
 
 def mut_list_to_str(l, locus):

@@ -1,9 +1,8 @@
-#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 import logging
 logger = logging.getLogger()
 
 import argparse
-import sys
 import os
 import string
 import re
