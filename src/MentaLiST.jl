@@ -116,7 +116,7 @@ function parse_commandline()
     # Build DB from FASTA, options:
     import_settings(s["build_db"], s_db)
     @add_arg_table s["build_db"] begin
-        "-db", "--database"
+        "-d", "--database"
             arg_type = String
             help = "MLST Fasta Database Directory"
             required = true
