@@ -5,11 +5,13 @@ from collections import defaultdict, Counter
 import argparse
 from Bio import SeqIO
 
+
 def mut_list_to_str(l, locus):
     c = Counter([x[1] for x in l])
     if len(c) == 1:
         return str(list(c)[0])
     return ", ".join(["%dx (%d)" % (times, mut) for (mut, times) in c.items()])
+
 
 def main(param):
     logger = logging.getLogger()
@@ -63,6 +65,7 @@ def main(param):
 
     logger.info("Done.")
 
+
 def run():
 
     parser = argparse.ArgumentParser(description="Given a list of FASTA files with novel alleles found with MentaLiST, output a FASTA with a unique list of novel alleles.")
@@ -75,7 +78,6 @@ def run():
     param = parser.parse_args()
 
     main(param)
-
 
 
 if __name__ == '__main__':

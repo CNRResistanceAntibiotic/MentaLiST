@@ -116,10 +116,9 @@ function parse_commandline()
     # Build DB from FASTA, options:
     import_settings(s["build_db"], s_db)
     @add_arg_table s["build_db"] begin
-        "-f", "--fasta_files"
-            nargs = '+'
+        "-db", "--database"
             arg_type = String
-            help = "Fasta files with the MLST scheme"
+            help = "MLST Fasta Database Directory"
             required = true
         "-p", "--profile"
             arg_type = String
@@ -212,7 +211,7 @@ end
 function download_pubmlst(args)
   loci_files, profile_file = download_pubmlst_scheme(args["scheme"], args["output"])
   @info "Building the k-mer database ..."
-  args["fasta_files"] = loci_files
+  args["database"] = dirname(loci_files[0])
   args["profile"] = profile_file
   build_db(args)
 end
@@ -224,7 +223,7 @@ end
 function download_cgmlst(args)
   loci_files = download_cgmlst_scheme(args["scheme"], args["output"])
   @info "Building the k-mer database ..."
-  args["fasta_files"] = loci_files
+  args["database"] = dirname(loci_files[0])
   args["profile"] = nothing
   build_db(args)
 end
@@ -232,7 +231,7 @@ end
 function download_enterobase(args)
   loci_files = download_enterobase_scheme(args["scheme"], args["type"], args["output"])
   @info "Building the k-mer database ..."
-  args["fasta_files"] = loci_files
+  args["database"] = dirname(loci_files[0])
   args["profile"] = nothing
   build_db(args)
 end
@@ -246,24 +245,27 @@ function build_db(args, version=VERSION)
     end
   end
 
+  # get files
+  fasta_files = readdir(args["database"], join=true)
+
   # check if files exist:
-  check_files(args["fasta_files"])
+  check_files(fasta_files)
   # get arguments and call the kmer db builder for each locus:
   k::Int8 = args["k"]
   db_file = args["db"]
   profile = args["profile"]
   @info "Opening FASTA files ... "
-  results, loci = kmer_class_for_each_locus(DNAKmer{k}, args["fasta_files"], args["allele_coverage"])
+  results, loci = kmer_class_for_each_locus(DNAKmer{k}, fasta_files, args["allele_coverage"])
   # Combine results:
   @info "Combining results for each locus ..."
   kmer_classification = combine_loci_classification(DNAKmer{k}, results, loci)
 
-  for (index, fasta_file) in enumerate(args["fasta_files"])
+  for (index, fasta_file) in enumerate(fasta_files)
     scheme_fasta_directory = pop!(split(dirname(fasta_file), "/"))
     if scheme_fasta_directory == ""
       scheme_fasta_directory = "."
     end
-    args["fasta_files"][index] = scheme_fasta_directory * "/" * basename(fasta_file)
+    fasta_files[index] = scheme_fasta_directory * "/" * basename(fasta_file)
   end
   @info "Saving DB ..."
   save_db(DNAKmer{k}, kmer_classification, loci, db_file, profile, args, version)
