@@ -246,7 +246,12 @@ function build_db(args, version=VERSION)
   end
 
   # get files
-  fasta_files = readdir(args["database"], join=true)
+  fasta_files = readdir(args["database"])
+
+  # get abs path
+  for i in 1:length(fasta_files)
+    fasta_files[i]=joinpath(args["database"], test[i])
+  end
 
   # check if files exist:
   check_files(fasta_files)
