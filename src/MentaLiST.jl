@@ -250,7 +250,7 @@ function build_db(args, version=VERSION)
 
   # get abs path
   for i in 1:length(fasta_files)
-    fasta_files[i]=joinpath(args["database"], test[i])
+    fasta_files[i]=joinpath(args["database"], fasta_files[i])
   end
 
   # check if files exist:
