@@ -211,7 +211,7 @@ end
 function download_pubmlst(args)
   loci_files, profile_file = download_pubmlst_scheme(args["scheme"], args["output"])
   @info "Building the k-mer database ..."
-  args["database"] = dirname(loci_files[0])
+  args["database"] = dirname(loci_files[1])
   args["profile"] = profile_file
   build_db(args)
 end
@@ -223,7 +223,7 @@ end
 function download_cgmlst(args)
   loci_files = download_cgmlst_scheme(args["scheme"], args["output"])
   @info "Building the k-mer database ..."
-  args["database"] = dirname(loci_files[0])
+  args["database"] = dirname(loci_files[1])
   args["profile"] = nothing
   build_db(args)
 end
@@ -231,7 +231,7 @@ end
 function download_enterobase(args)
   loci_files = download_enterobase_scheme(args["scheme"], args["type"], args["output"])
   @info "Building the k-mer database ..."
-  args["database"] = dirname(loci_files[0])
+  args["database"] = dirname(loci_files[1])
   args["profile"] = nothing
   build_db(args)
 end
