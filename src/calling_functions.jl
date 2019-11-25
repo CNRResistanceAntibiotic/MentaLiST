@@ -17,12 +17,16 @@ function run_calling_pipeline(args)
   @info("Opening kmer database ... ")
   kmer_db, loci, loci2alleles, db_coverage, k, profile, build_args = open_db(args["db"])
 
+
+  # get files
+  fasta_files = readdir(build_args["database"])
+
   # prepend base path of the kmer database on to the relative paths for allele fasta files stored in the db
-  for (index, file) in enumerate(build_args["fasta_files"])
-    build_args["fasta_files"][index] = joinpath(dirname(args["db"]), file)
+  for (index, file) in enumerate(fasta_files)
+    fasta_files[index] = joinpath(dirname(args["db"]), file)
   end
   # check if scheme fasta files exist
-    check_files(build_args["fasta_files"])
+    check_files(fasta_files)
   # process each sample:
   for (sample, fq_files) in sample_files
     @info("Sample: $sample. Opening fastq file(s) and counting kmers ... ")
@@ -32,7 +36,7 @@ function run_calling_pipeline(args)
     @info("Calling alleles and novel alleles ...")
     # If fasta are given as input, set kt as 1:
     kt = args["fasta"] ? 1 : args["kt"]
-    allele_calls, voting_result = call_alleles(DNAKmer{k}, kmer_count, votes, loci_votes, loci, loci2alleles, build_args["fasta_files"], kt, args["mutation_threshold"], args["output_votes"])
+    allele_calls, voting_result = call_alleles(DNAKmer{k}, kmer_count, votes, loci_votes, loci, loci2alleles, fasta_files, kt, args["mutation_threshold"], args["output_votes"])
     push!(sample_results, (sample, allele_calls, voting_result))
   end
   @info("Writing output ...")
