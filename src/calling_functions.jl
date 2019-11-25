@@ -19,7 +19,7 @@ function run_calling_pipeline(args)
 
 
   # get files
-  fasta_files = readdir(build_args["database"])
+  fasta_files = readdir(joinpath(dirname(args["db"]), build_args["database"]))
 
   # prepend base path of the kmer database on to the relative paths for allele fasta files stored in the db
   for (index, file) in enumerate(fasta_files)
