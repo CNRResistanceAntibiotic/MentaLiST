@@ -18,6 +18,8 @@ function run_calling_pipeline(args)
   kmer_db, loci, loci2alleles, db_coverage, k, profile, build_args = open_db(args["db"])
 
 
+  println(keys(build_args))
+
   # get files
   fasta_files = readdir(joinpath(dirname(args["db"]), build_args["database"]))
 
