@@ -19,6 +19,11 @@ function run_calling_pipeline(args)
 
 
   println(keys(build_args))
+  println(keys(build_args["database"]))
+  println(keys(build_args["output"]))
+  println(keys(build_args["k"]))
+  println(keys(build_args["db"]))
+  println(keys(build_args["scheme"]))
 
   # get files
   fasta_files = readdir(joinpath(dirname(args["db"]), build_args["database"]))
