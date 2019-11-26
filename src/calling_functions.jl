@@ -17,14 +17,6 @@ function run_calling_pipeline(args)
   @info("Opening kmer database ... ")
   kmer_db, loci, loci2alleles, db_coverage, k, profile, build_args = open_db(args["db"])
 
-
-  println(keys(build_args))
-  println(keys(build_args["database"]))
-  println(keys(build_args["output"]))
-  println(keys(build_args["k"]))
-  println(keys(build_args["db"]))
-  println(keys(build_args["scheme"]))
-
   fasta_dir = joinpath(dirname(args["db"]), build_args["database"])
 
   # get files
