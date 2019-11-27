@@ -29,9 +29,10 @@ def main(param):
         f_path = os.path.join(param.pathDB, f)
         logger.debug("Opening file %s ..." % f)
         file_no_ext, ext = os.path.splitext(f_path)
-        locus = os.path.basename(f_path)
+        locus = os.path.basename(f_path).split(".")[0]
         record_list = [seq_record for seq_record in SeqIO.parse(f_path, "fasta")]
         # if there are novel alleles for this locus, add:
+
         if len(novel[locus]) > 0:
             # find maximum id present, novel alleles gets next;
             id_list = [int(s.id.split("_")[-1]) for s in record_list]
