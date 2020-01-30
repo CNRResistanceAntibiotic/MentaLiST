@@ -16,11 +16,9 @@ def main(param):
     # Opening novel alleles:
     logger.info("Opening the novel alleles file ...")
     novel = collections.defaultdict(list)
-    novel_list = []
 
     for seq_record in SeqIO.parse(param.novel, "fasta"):
         novel[seq_record.id].append(seq_record)
-        novel_list.append(seq_record.id)
 
     # Open mlst
     mlst = {}
@@ -28,12 +26,10 @@ def main(param):
     for f in os.listdir(param.pathDB):
 
         locus = f.split(".")[0]
-        for id in novel_list:
-            name_locus = id.split("_")[0]
-            supp_locus = id.split("_")[1]
+        for id, seq in novel.items():
 
             # if there are novel alleles for this locus, add:
-            if locus == name_locus:
+            if locus == id:
                 f_path = os.path.join(param.pathDB, f)
                 logger.debug("Opening file %s ..." % f)
                 file_no_ext, ext = os.path.splitext(f_path)
@@ -45,7 +41,7 @@ def main(param):
                 # append novels:
                 for record in novel[id]:
                     record = record
-                    record.id = "{0}_{1}".format(name_locus, next_id)
+                    record.id = "{0}_{1}".format(id, next_id)
                     record.name = record.description = ""
                     next_id += 1
                     # check if sequence already exist
