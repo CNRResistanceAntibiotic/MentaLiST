@@ -21,7 +21,6 @@ def main(param):
         novel[seq_record.id].append(seq_record)
 
     # Open mlst
-    mlst = {}
     logger.info("Opening the MLST fasta database and adding novel alleles ...")
     for f in os.listdir(param.pathDB):
 

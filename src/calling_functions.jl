@@ -256,8 +256,10 @@ function call_alleles(::Type{DNAKmer{k}}, kmer_count, votes, loci_votes, loci, l
       allele_set = Set([al for (al, votes) in selected_allele_votes])
       allele_seqs = read_alleles(fasta_file, allele_set)
       allele_coverage = [AlleleCoverage(al, votes, sequence_coverage(DNAKmer{k}, allele_seqs[al], kmer_count, kmer_thr)...) for (al, votes) in selected_allele_votes]
+
       # filter to find fully covered alleles:
       covered = [x for x in allele_coverage if (x.depth >= kmer_thr)] # if I remove alleles with negative votes, I might the reconstruct the same allele on the novel rebuild; better to flag output
+
       if length(covered) == 1
         # choose the only fully covered allele
         allele_label = locus2alleles[covered[1].allele]
@@ -278,10 +280,12 @@ function call_alleles(::Type{DNAKmer{k}}, kmer_count, votes, loci_votes, loci, l
       # got here, no allele is covered; if the uncovered part is small enough, try novel allele
       # Try to find novel; sort by # of uncovered kmers, smallest to largest
       sorted_allele_coverage = sort(allele_coverage, by=x->x.uncovered_kmers)
+
       uncovered_kmers = sorted_allele_coverage[1].uncovered_kmers
       covered_kmers = sorted_allele_coverage[1].covered_kmers
       coverage = covered_kmers / (covered_kmers + uncovered_kmers)
       # each mutation gives around k uncovered kmers, so if smallest_uncovered > k * max_mutations, then declare missing;
+
       if uncovered_kmers > k * max_mutations # consider not present; TODO: better criteria?
         allele = sorted_allele_coverage[1].allele
         allele_label = "$(locus2alleles[allele])"
@@ -351,6 +355,7 @@ function call_alleles(::Type{DNAKmer{k}}, kmer_count, votes, loci_votes, loci, l
     # If I did not get a full covered call, or novel, try looking at ALL alleles
     if (allele_call.depth == 0 || allele_call.allele == "N") && (tie_idx <= length(sorted_voted_alleles))
       second_call = call_from_selected_allele_votes(sorted_voted_alleles[tie_idx:end])
+
       if second_call.depth == 0
         return allele_call
       else
@@ -392,6 +397,7 @@ function call_alleles(::Type{DNAKmer{k}}, kmer_count, votes, loci_votes, loci, l
 
   # get all calls:
   allele_calls = [call_allele(votes[idx], loci_votes[idx], loci[idx], loci2alleles[idx], fasta_files[idx]) for (idx, locus) in enumerate(loci)]
+
 
   # Also do voting output?
   if output_votes
@@ -578,7 +584,15 @@ function count_votes(kmer_count, kmer_db, loci2alleles, db_coverage)
   for (kmer, count) in kmer_count
     if haskey(kmer_db, kmer)
       for (locus, weight, alleles) in kmer_db[kmer]
-        v = weight * count
+
+        #MODIFICATION BY AURELIEN BIRER => A positif count is more weighted
+        if weight <= 0
+          v = weight * count
+        end
+        if weight >= 0
+
+          v = weight * count * weight
+        end
         loci_votes[locus] += abs(v)
         for allele in alleles
           votes[locus][allele] += v
@@ -592,6 +606,7 @@ function count_votes(kmer_count, kmer_db, loci2alleles, db_coverage)
   #     allele_votes[al] = Int(round(allele_votes[al]/db_coverage[locus][al]))
   #   end
   # end
+
   return votes, loci_votes
 end
 
