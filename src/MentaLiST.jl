@@ -17,7 +17,7 @@ function parse_commandline()
     s.version = "MentaLiST $VERSION."
     s.allow_ambiguous_opts= true # to allow -1 and -2.
     s.preformatted_epilog = true
-    @add_arg_table s begin
+    @add_arg_table! s begin
       "call"
         help = "MLST caller, given a sample and a k-mer database."
         action = :command
@@ -55,7 +55,7 @@ function parse_commandline()
       "mentalist call -o my_sample.mlst --db my_scheme.db -1 sample_1.fastq.gz -2 sample_2.fastq.gz # one paired-end sample.\n" *
       "mentalist call -o all_samples.mlst --db my_scheme.db -1 *.fastq.gz -2 *.fastq.gz # multiple paired-end samples."
 
-    @add_arg_table s["call"] begin
+    @add_arg_table! s["call"] begin
         "-o"
           help = "Output file with MLST call"
           arg_type = String
@@ -95,7 +95,7 @@ function parse_commandline()
 
     ## Common option for all db building commands:
     s_db = ArgParseSettings()
-    @add_arg_table s_db begin
+    @add_arg_table! s_db begin
       "--db"
         help = "Output file (kmer database)"
         arg_type = String
@@ -114,8 +114,8 @@ function parse_commandline()
        help = "Minimum percentage of allele coverage in number of kmers of each allele."
     end
     # Build DB from FASTA, options:
-    import_settings(s["build_db"], s_db)
-    @add_arg_table s["build_db"] begin
+    import_settings!(s["build_db"], s_db)
+    @add_arg_table! s["build_db"] begin
         "-d", "--database"
             arg_type = String
             help = "MLST Fasta Database Directory"
@@ -125,7 +125,7 @@ function parse_commandline()
             help = "Profile file for known genotypes."
     end
 
-    @add_arg_table s["db_info"] begin
+    @add_arg_table! s["db_info"] begin
       "--db"
         help = "MentaLiST kmer database"
         arg_type = String
@@ -134,22 +134,22 @@ function parse_commandline()
 
     # Listing functions, common options:
     s_list = ArgParseSettings()
-    @add_arg_table s_list begin
+    @add_arg_table! s_list begin
       "-p", "--prefix"
       help = "Only list schemes where the species name starts with this prefix."
       arg_type = String
     end
 
     # List pubmlst
-    import_settings(s["list_pubmlst"], s_list)
+    import_settings!(s["list_pubmlst"], s_list)
 
     # List cgmlst
-    import_settings(s["list_cgmlst"], s_list)
+    import_settings!(s["list_cgmlst"], s_list)
 
     # Common options for MLST download functions:
     s_db_download = ArgParseSettings()
-    import_settings(s_db_download, s_db) # import build_db common options
-    @add_arg_table s_db_download begin
+    import_settings!(s_db_download, s_db) # import build_db common options
+    @add_arg_table! s_db_download begin
       "-o", "--output"
         help = "Output folder for the scheme Fasta files."
         arg_type = String
@@ -161,16 +161,16 @@ function parse_commandline()
     end
 
     # Download pubmlst:
-    import_settings(s["download_pubmlst"], s_db_download) # import common options
+    import_settings!(s["download_pubmlst"], s_db_download) # import common options
 
     # Download cgmlst:
-    import_settings(s["download_cgmlst"], s_db_download)  # import common options
+    import_settings!(s["download_cgmlst"], s_db_download)  # import common options
 
     # Download enterobase:
-    import_settings(s["download_enterobase"], s_db_download) # import common options
+    import_settings!(s["download_enterobase"], s_db_download) # import common options
     # add (and override) specific enterobase options:
     s["download_enterobase"].error_on_conflict = false  # do not error-out when trying to override an option
-    @add_arg_table s["download_enterobase"] begin
+    @add_arg_table! s["download_enterobase"] begin
       "-s", "--scheme"
         help = "Letter identifying which scheme: (S)almonella, (Y)ersinia, or (E)scherichia/Shigella."
         arg_type = String
@@ -237,6 +237,7 @@ function download_enterobase(args)
 end
 
 function build_db(args, version=VERSION)
+
   # check if we need Gurobi:
   if args["allele_coverage"] < 1
     ok = include_gurobi()

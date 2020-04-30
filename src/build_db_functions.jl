@@ -109,7 +109,6 @@ function kmer_class_for_each_locus(::Type{DNAKmer{k}}, files::Vector{String}, co
   else
     results = pmap(file->build_db_graph(DNAKmer{k}, file, coverage), files)
   end
-
   return results, loci
 end
 
